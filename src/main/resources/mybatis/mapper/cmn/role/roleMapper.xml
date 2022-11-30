@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.letech.study02.cmn.role.dao.RoleDao">
+
+  <insert id="insertDefaultRole">
+    /* kr.letech.study02.cmn.role.dao.RoleDao.insertDefaultRole */
+    INSERT INTO TB_USER_ROLE (
+        MEM_ID
+      , ROLE_ID
+    ) VALUES (
+        #{memId, jdbcType=VARCHAR}
+      , 'R001'
+    )
+  </insert>
+
+  <select id="selectRoleList" resultType="kr.letech.study02.cmn.role.vo.RoleVo">
+    /* kr.letech.study02.cmn.role.dao.RoleDao.selectRoleList */
+    SELECT A.MEM_ID
+         , A.ROLE_ID
+         , B.ROLE_NM
+      FROM TB_USER_ROLE A
+     INNER JOIN TB_ROLE B ON(A.ROLE_ID = B.ROLE_ID)
+     WHERE 1 = 1
+       AND A.MEM_ID = #{memId}
+  </select>
+</mapper>

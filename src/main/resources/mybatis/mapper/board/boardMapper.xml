@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="kr.letech.study02.board.dao.BoardDao">
+
+  <sql id="searchFrag">
+    <if test="searchVo != null and searchVo.searchWord != null">
+    <choose>
+      <when test="searchVo.searchType != null and searchVo.searchType.equals('boardTtl')">
+       AND INSTR(BOARD_TTL, #{searchVo.searchWord}) > 0
+      </when>
+      <when test="searchVo.searchType != null and searchVo.searchType.equals('boardCont')">
+      AND INSTR(BOARD_CONT, #{searchVo.searchWord}) > 0
+      </when>
+      <when test="searchVo.searchType != null and searchVo.searchType.equals('boardTtlCont')">
+      AND (
+          INSTR(BOARD_TTL, #{searchVo.searchWord}) > 0
+          OR
+          INSTR(BOARD_CONT, #{searchVo.searchWord}) > 0
+      )
+      </when>
+      <otherwise>
+      <!-- 작성자ID는 유저 테이블이 없어서 못 만듬 -->
+      AND (
+          INSTR(BOARD_TTL, #{searchVo.searchWord}) > 0
+          OR
+          INSTR(BOARD_CONT, #{searchVo.searchWord}) > 0
+      )
+      </otherwise>
+    </choose>
+    </if>
+  </sql>
+
+  <select id="selectBoardList" resultType="kr.letech.study02.board.vo.BoardVo">
+	  /* kr.letech.study02.board.dao.BoardDao.selectBoardList */
+	  SELECT A.BOARD_NO                                AS boardNo
+         , '[' || B.CD_NAME || '] ' || A.BOARD_TTL   AS boardTtl
+         , C.CD_NAME                                 AS boardCatNm
+         , A.RGST_ID                                 AS rgstId
+         , TO_CHAR(A.RGST_DT, 'YY-MM-DD HH:MM')      AS rgstDt
+         , A.UPDT_ID                                 AS updtId
+         , A.UPDT_DT                                 AS updtDt
+         , A.BOARD_HIT                               AS boardHit
+      FROM TB_BOARD A
+     INNER JOIN TB_CODE B ON(A.BOARD_DIV = B.CD)
+     INNER JOIN TB_CODE C ON(A.BOARD_CAT = C.CD)
+     WHERE 1 = 1
+       AND A.DEL_YN    = 'N'
+       <include refid="searchFrag" />
+     ORDER BY A.BOARD_NO DESC
+	   LIMIT #{startRow} - 1, #{screenSize}
+  </select>
+
+  <select id="selectBoardTotalCount" resultType="int">
+	  /* kr.letech.study02.board.dao.BoardDao.selectBoardTotalCount */
+	  SELECT COUNT(*)
+	    FROM TB_BOARD
+	   WHERE 1 = 1
+	     AND DEL_YN = 'N'
+	     <include refid="searchFrag" />
+  </select>
+
+  <select id="selectBoardOne" resultType="kr.letech.study02.board.vo.BoardVo">
+    /* kr.letech.study02.board.dao.BoardDao.selectBoardOne */
+    SELECT A.BOARD_NO                               AS boardNo
+         , A.BOARD_TTL                              AS boardTtl
+         , A.BOARD_DIV                              AS boardDiv
+         , A.BOARD_CAT                              AS boardCat
+         , B.CD_NAME                                AS boardCatNm
+         , A.BOARD_CONT                             AS boardCont
+         , A.ATCH_ID                                AS atchId
+         , A.RGST_ID                                AS rgstId
+         , TO_CHAR(A.RGST_DT, 'YYYY-MM-DD HH:MM')   AS rgstDt
+         , A.BOARD_HIT                              AS boardHit
+      FROM TB_BOARD A
+     INNER JOIN TB_CODE B ON(A.BOARD_CAT = B.CD)
+     WHERE 1 = 1
+       AND BOARD_NO = #{boardNo}
+  </select>
+
+  <insert id="insertBoard">
+    /* kr.letech.study02.board.dao.BoardDao.insertBoard */
+    <selectKey keyProperty="boardNo" resultType="int" order="BEFORE">
+      SELECT NVL(MAX(BOARD_NO), 0) + 1
+        FROM TB_BOARD
+    </selectKey>
+    INSERT INTO TB_BOARD (
+           BOARD_NO
+		     , BOARD_TTL
+		     , BOARD_DIV
+		     , BOARD_CAT
+		     , BOARD_CONT
+		     , ATCH_ID
+		     , RGST_ID
+		     , RGST_DT
+		     , BOARD_HIT
+	  )
+    VALUES (
+		       #{boardNo,    jdbcType=NUMERIC}
+	       , #{boardTtl,   jdbcType=VARCHAR}
+	       , #{boardDiv,   jdbcType=VARCHAR}
+	       , #{boardCat,   jdbcType=VARCHAR}
+	       , #{boardCont,  jdbcType=VARCHAR}
+	       , #{atchId,     jdbcType=VARCHAR}
+	       , #{rgstId,     jdbcType=VARCHAR}
+	       , NOW()
+	       , 0
+		)
+  </insert>
+
+  <update id="deleteBoard">
+    /* kr.letech.study02.board.dao.BoardDao.deleteBoard */
+    UPDATE TB_BOARD
+       SET DEL_YN = 'Y'
+     WHERE 1 = 1
+       AND BOARD_NO = #{boardNo}
+  </update>
+
+  <update id="updateBoard">
+    /* kr.letech.study02.board.dao.BoardDao.updateBoard */
+    UPDATE TB_BOARD
+       SET BOARD_TTL = #{boardTtl,    jdbcType=VARCHAR}
+         , BOARD_CAT = #{boardCat,    jdbcType=VARCHAR}
+         , BOARD_CONT = #{boardCont,  jdbcType=VARCHAR}
+         , UPDT_DT = NOW()
+     WHERE BOARD_NO = #{boardNo}
+  </update>
+
+  <update id="updateBoardHit">
+    /* kr.letech.study02.board.dao.BoardDao.updateBoardHit */
+    UPDATE TB_BOARD
+       SET BOARD_HIT = BOARD_HIT + 1
+     WHERE BOARD_NO = #{boardNo}
+  </update>
+
+  <select id="selectBoardOneAtchList" resultType="kr.letech.study02.cmn.atch.vo.AtchVo">
+    /* kr.letech.study02.board.dao.BoardDao.selectBoardOneAtchList */
+    SELECT B.ATCH_ID          AS atchId
+         , B.ATCH_SEQ         AS atchSeq
+         , B.ATCH_ORIG_NM     AS atchOrigNm
+         , B.ATCH_SAVE_NM     AS atchSaveNm
+         , B.ATCH_PATH        AS atchPath
+         , B.ATCH_SIZE        AS atchSize
+         , B.ATCH_EXTN        AS atchExtn
+      FROM TB_BOARD A
+     INNER JOIN TB_ATCH B ON(A.ATCH_ID = B.ATCH_ID)
+     WHERE 1 = 1
+       AND A.BOARD_NO = #{boardNo}
+       AND B.DEL_YN = 'N'
+  </select>
+
+  <select id="selectBoardOneCmntList" resultType="kr.letech.study02.cmnt.vo.CmntVo">
+    /* kr.letech.study02.board.dao.BoardDao.selectBoardOneCmntList */
+    SELECT B.CMNT_SEQ                                 AS cmntSeq
+				 , B.BOARD_NO                                 AS boardNo
+				 , B.CMNT_CONT                                AS cmntCont
+				 , B.RGST_ID                                  AS rgstId
+				 , TO_CHAR(B.RGST_DT, 'YYYY-MM-dd HH:MM:SS')  AS rgstDt
+				 , TO_CHAR(B.UPDT_DT, 'YYYY-MM-dd HH:MM:SS')  AS updtDt
+      FROM TB_BOARD A
+     INNER JOIN TB_CMNT B ON(A.BOARD_NO = B.BOARD_NO AND A.BOARD_NO = #{boardNo})
+     WHERE B.DEL_YN = 'N'
+  </select>
+
+  <update id="updateBoardAtchId">
+    /* kr.letech.study02.board.dao.BoardDao.updateBoardAtchId */
+    UPDATE TB_BOARD
+       SET ATCH_ID = #{atchId, jdbcType=CHAR}
+     WHERE BOARD_NO = #{boardNo}
+  </update>
+</mapper>

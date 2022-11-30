@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.letech.study02.mem.dao.MemDao">
+
+  <select id="checkMemId" resultType="int">
+    /* kr.letech.study02.mem.dao.MemDao.checkMemId */
+    SELECT COUNT(MEM_ID)
+      FROM TB_MEM
+     WHERE MEM_ID = #{memId}
+  </select>
+
+  <insert id="inserMember">
+    /* kr.letech.study02.mem.dao.MemDao.inserMember */
+    INSERT INTO TB_MEM (
+        MEM_ID
+      , MEM_PSWD
+      , MEM_NM
+      , MEM_EML
+    ) VALUES (
+        #{memId     , jdbcType=VARCHAR}
+      , #{memPswd   , jdbcType=VARCHAR}
+      , #{memNm     , jdbcType=VARCHAR}
+      , #{memEml    , jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <select id="selectMemberByMemId" resultType="kr.letech.study02.mem.vo.MemVo">
+    /* kr.letech.study02.mem.dao.MemDao.selectMemberOne */
+    SELECT MEM_ID     AS memId
+         , MEM_PSWD   AS memPswd
+         , MEM_NM     AS memNm
+         , MEM_EML    AS memEml
+      FROM TB_MEM
+     WHERE 1 = 1
+       AND MEM_ID = #{memId}
+  </select>
+</mapper>

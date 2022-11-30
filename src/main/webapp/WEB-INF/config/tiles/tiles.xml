@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<!-- main layout -->
+	<definition name="base-layout" template="/WEB-INF/layouts/layout-base.jsp">
+		<put-attribute name="header" value="/WEB-INF/layouts/parts/header.jsp" />
+		<put-attribute name="left" value="/WEB-INF/layouts/parts/sidebar.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="foot" value="/WEB-INF/layouts/parts/footer.jsp" />
+	</definition>
+
+	<definition name="*.base" extends="base-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+	<definition name="*/*.base" extends="base-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+	<definition name="*/*/*.base" extends="base-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+
+	<definition name="empty-layout" template="/WEB-INF/layouts/layout-empty.jsp">
+		<put-attribute name="body" value="" />
+    </definition>
+
+	<definition name="*.empty" extends="empty-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+	<definition name="*/*.empty" extends="empty-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+	<definition name="*/*/*.empty" extends="empty-layout">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+		<put-attribute name="title" value="자바교육" />
+	</definition>
+
+	<definition name="login-layout" template="/WEB-INF/layouts/layout-login.jsp">
+    <put-attribute name="body" value="" />
+  </definition>
+
+  <definition name="*.login" extends="login-layout">
+    <put-attribute name="body" value="/WEB-INF/views/{1}.jsp" />
+    <put-attribute name="title" value="자바교육" />
+  </definition>
+
+  <definition name="*/*.login" extends="login-layout">
+    <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    <put-attribute name="title" value="자바교육" />
+  </definition>
+
+  <definition name="*/*/*.login" extends="login-layout">
+    <put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+    <put-attribute name="title" value="자바교육" />
+  </definition>
+
+</tiles-definitions>

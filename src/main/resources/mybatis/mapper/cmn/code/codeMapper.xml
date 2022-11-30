@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+  <mapper namespace="kr.letech.study02.cmn.code.dao.CodeDAO">
+
+  <!-- 코드 그룹 목록 -->
+  <select id="selectCodeGrpList" resultType="kr.letech.study02.cmn.code.vo.CodeGrpVO">
+    /* kr.letech.study02.cmn.code.dao.CodeDAO.selectCodeGrpList */
+    SELECT CD_GRP		                         AS cdGrp    /* 코드 그룹 */
+         , CD_GRP_NM                         AS cdGrpNm
+         , ORD			                         AS ord
+         , USE_YN		                         AS useYn
+         , RGST_ID	                         AS rgstId
+         , TO_CHAR(RGST_DT, 'YYYY-MM-DD')	   AS rgstDt
+      FROM TB_CODE_GRP
+     WHERE 1 = 1
+       AND DEL_YN = 'N'
+       <if test='srchCdGrp != null and srchCdGrp.trim() != ""'>
+       AND CD_GRP LIKE '%' || #{srchCdGrp} || '%'
+       </if>
+       <if test='srchCdGrpNm != null and srchCdGrpNm.trim() != ""'>
+       AND UPPER(CD_GRP_NM) LIKE '%' || UPPER(#{srchCdGrpNm}) || '%'
+       </if>
+  </select>
+
+  <!-- 코드 그룹 상세 -->
+  <select id="selectCodeGrp" resultType="kr.letech.study02.cmn.code.vo.CodeGrpVO">
+    /* kr.letech.study02.cmn.code.dao.CodeDAO.selectCodeGrp */
+    SELECT CD_GRP                            AS cdGrp    /* 코드 그룹 */
+         , CD_GRP_NM                         AS cdGrpNm
+         , ORD                               AS ord
+         , USE_YN                            AS useYn
+         , RGST_ID                           AS rgstId
+         , TO_CHAR(RGST_DT, 'YYYY-MM-DD')    AS rgstDt
+         , UPDT_ID                           AS updtId
+         , TO_CHAR(UPDT_DT, 'YYYY-MM-DD')    AS updtDt
+         , DEL_YN                            AS delYn
+      FROM TB_CODE_GRP
+     WHERE 1 = 1
+       AND CD_GRP = #{cdGrp}
+  </select>
+
+  <insert id="insertCodeGrp">
+    /* kr.letech.study02.cmn.code.dao.CodeDAO.insertCodeGrp */
+    INSERT INTO TB_CODE_GRP
+	       (
+	         CD_GRP
+	       , CD_GRP_NM
+	       , ORD
+	       , USE_YN
+	       , RGST_ID
+	       , RGST_DT
+	       , UPDT_ID
+	       , UPDT_DT
+	       , DEL_YN
+	       )
+	         VALUES
+	       (
+	         #{cdGrp}
+         , #{cdGrpNm}
+         , #{ord}
+         , #{useYn}
+         , #{rgstId}
+         , NOW()
+         , #{updtId}
+         , NOW()
+         , 'N'
+	       )
+  </insert>
+</mapper>

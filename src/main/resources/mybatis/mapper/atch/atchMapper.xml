@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.letech.study02.cmn.atch.dao.AtchDao">
+
+  <select id="selectAtch" resultType="kr.letech.study02.cmn.atch.vo.AtchVo">
+    /* kr.letech.study02.cmn.atch.dao.AtchDao.selectAtch */
+    SELECT ATCH_ORIG_NM    AS atchOrigNm
+	       , ATCH_SAVE_NM    AS atchSaveNm
+	       , ATCH_PATH       AS atchPath
+	       , ATCH_EXTN       AS atchExtn
+	    FROM TB_ATCH
+	   WHERE 1 = 1
+	     AND DEL_YN = 'N'
+	     AND ATCH_ID = #{atchId}
+	     AND ATCH_SEQ = #{atchSeq}
+  </select>
+
+  <insert id="insertAtch">
+    /* kr.letech.study02.cmn.atch.dao.AtchDao.insertAtch */
+    <selectKey keyProperty="atchSeq" resultType="int" order="BEFORE">
+      SELECT NVL(MAX(ATCH_SEQ), 0) + 1
+        FROM TB_ATCH
+       WHERE ATCH_ID = #{atchId}
+    </selectKey>
+    INSERT INTO TB_ATCH (
+        ATCH_ID
+			, ATCH_SEQ
+			, ATCH_ORIG_NM
+			, ATCH_SAVE_NM
+			, ATCH_PATH
+			, ATCH_SIZE
+			, ATCH_EXTN
+			, RGST_ID
+			, RGST_DT
+      , DEL_YN
+    ) VALUES (
+        #{atchId,        jdbcType=CHAR}
+			, #{atchSeq,       jdbcType=NUMERIC}
+			, #{atchOrigNm,    jdbcType=VARCHAR}
+			, #{atchSaveNm,    jdbcType=VARCHAR}
+			, #{atchPath,      jdbcType=VARCHAR}
+			, #{atchSize,      jdbcType=BIGINT}
+			, #{atchExtn,      jdbcType=VARCHAR}
+			, #{rgstId,        jdbcType=VARCHAR}
+			, NOW()
+			, 'N'
+    )
+  </insert>
+
+  <update id="deleteAtch">
+    /* kr.letech.study02.cmn.atch.dao.AtchDao.deleteAtch */
+    UPDATE TB_ATCH
+       SET UPDT_DT = NOW()
+         , DEL_YN = 'Y'
+     WHERE 1 = 1
+       AND ATCH_ID = #{atchId}
+       AND ATCH_SEQ = #{atchSeq}
+  </update>
+</mapper>
