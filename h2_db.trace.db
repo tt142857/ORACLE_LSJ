@@ -1,0 +1,7 @@
+2022-12-01 14:24:07 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TB_BOARD" not found (this database is empty); SQL statement:
+/* kr.letech.study02.board.dao.BoardDao.selectBoardTotalCount */
+	  SELECT COUNT(*)
+	    FROM TB_BOARD
+	   WHERE 1 = 1
+	     AND DEL_YN = 'N' [42104-214]
